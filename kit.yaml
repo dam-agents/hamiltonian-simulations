@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/dam-agents/dam-starter-kits/main/kit.schema.json
+# This public DAM starter kit seeds its own kit.yaml and ONBOARDING.md into the
+# agent's home directory. The GHE seed cannot land, so the first session clones
+# lahs-agentic-workflows into ~/work/lahs-agentic-workflows and runs
+# bin/dam-setup setup there; the GHE skills are installed from that repo.
+schemaVersion: v1
+id: lahs-workflows-runner
+name: Hamiltonian Simulations
+tagline: Run Hamiltonian simulation workflows on IBM Quantum hardware.
+description: >-
+  Runs lahs-workflows pipelines on the deployed lahs-workflows Qiskit Function.
+  Onboarding first clones the GHE checkout and runs bin/dam-setup to update both
+  repositories, then checks that the agent can read the LAHS repositories on
+  github.ibm.com, guides you through saving your IBM Quantum account and
+  confirms the deployed functions.
+category: research
+icon: microscope
+docsUrl: https://github.ibm.com/LAHS/lahs-agentic-workflows
+harnesses: [claude-code, codex, pi, bob]
+
+connections:
+  - accepts: [github-enterprise]
+    required: true
+    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com.
+
+# The public kit repo has no skills of its own: install the agentic and
+# lahs-workflows skills from their GHE sources.
+skills:
+  - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
+    name: connect-cluster
+  - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
+    name: preflight
+  - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
+    name: run-workflow
+  - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
+    name: report-run
+  - source: https://github.ibm.com/LAHS/lahs-workflows/tree/main/.bob/skills
+    name: run-lahs-workflow
+  - source: https://github.ibm.com/LAHS/lahs-workflows/tree/main/.bob/skills
+    name: run-qiskit-function
+  - source: https://github.ibm.com/LAHS/lahs-workflows/tree/main/.bob/skills
+    name: analyse-sweep
+
+# Seed the public kit metadata; the GHE checkout is cloned by onboarding.
+seed:
+  self: true
+  into: home
+
+egressPreset: trusted
+egressRules:
+  - host: github.ibm.com
+    port: 443
+  - host: cdnjs.cloudflare.com
+    port: 443
+  - host: cloud.ibm.com
+    port: 443
+  - host: iam.cloud.ibm.com
+    port: 443
+  - host: resource-controller.cloud.ibm.com
+    port: 443
+  - host: api.global-search-tagging.cloud.ibm.com
+    port: 443
+  - host: globalcatalog.cloud.ibm.com
+    port: 443
+  - host: quantum.cloud.ibm.com
+    port: 443
+  - host: qiskit-serverless.quantum.ibm.com
+    port: 443
+  - host: s3.us-east.cloud-object-storage.appdomain.cloud
+    port: 443
+
+# The first turn of a new agent. Every step in ONBOARDING.md is safe to re-run.
+onboarding:
+  prompt: >-
+    Read ONBOARDING.md in your home directory (the public kit seed) and follow it.
+    First clone https://github.ibm.com/LAHS/lahs-agentic-workflows.git into
+    ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
+    repositories and install the tooling; then check GitHub access, guide the user
+    through saving their IBM Quantum account (Qiskit Functions CRN and API key,
+    typed into a hidden prompt in the terminal), and confirm the deployed Qiskit
+    Functions. Explain the skills at the end.

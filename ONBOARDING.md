@@ -60,18 +60,24 @@ Call `set_onboarding_checklist` with four steps:
 
 4. **IBM Quantum account.** The agent reaches the Qiskit Function with the user's own account: the
    Qiskit Functions instance **CRN** and an IBM Cloud **API key**. The user types the key into a
-   hidden prompt; it never goes through the chat. Tell the user, step by step:
+   hidden prompt; it never goes through the chat. Never put the API key in `kit.yaml`, an agent
+   environment variable, or chat: the kit is public and the running agent can read its environment.
+   The hidden prompt is the only supported path. Tell the user, step by step:
 
    a. Get an API key at https://cloud.ibm.com/iam/apikeys → **Create** (keep it ready to paste),
       and the CRN of the IBM Quantum instance that holds the Qiskit Functions (IBM Quantum
       platform → Instances; the Functions instance, not a runtime-only one).
 
-   b.  Ask the user to connect and run the following:
-      You can replace the agent name by yours via running `env | grep .name | cut -d "=" -f 3`
+   b. Ask the user to run the command in a terminal that can show the hidden prompt. Give both
+      routes:
+      - **In DAM (no local terminal):** open the agent, start a new session with no messages, and
+        choose **Terminal (browser)** beside the message box. Run the command there. If the hidden
+        prompt does not appear, fall back to the local route below.
+      - **From their machine:** run `dam ssh connect <agent name>` for a plain shell. The UI's
+        **VS Code / Zed (local)** shows the same command; **Terminal (local)** shows `dam chat`,
+        which attaches the harness TUI rather than a plain shell.
+
       ```bash
-      # User running on their laptop
-      dam ssh connect <agent name>
-      # User running on the vm
       ~/work/lahs-agentic-workflows/bin/qiskit-account --name lahs-functions
       ```
 
@@ -93,19 +99,31 @@ Call `set_onboarding_checklist` with four steps:
    ```bash
    uv run --no-project --with qiskit-ibm-catalog python - <<'EOF'
    from qiskit_ibm_catalog import QiskitServerless
-   serverless = QiskitServerless(name="lahs-functions")
-   for title in ("lahs-workflows", "lahs-workflows-gpu"):
-       fn = serverless.load(title)
-       print(title, "deployed" if fn else "missing", fn.sizes() if fn else "")
+   try:
+       serverless = QiskitServerless(name="lahs-functions")
+       for title in ("lahs-workflows", "lahs-workflows-gpu"):
+           fn = serverless.load(title)
+           print(title, "deployed" if fn else "missing", fn.sizes() if fn else "")
+   except Exception as e:
+       raise SystemExit(f"check failed before reading the titles: {type(e).__name__}: {e}")
    EOF
    ```
 
-   Report which titles are deployed and their sizes. If a title prints `missing`, give the user the
-   deploy instructions from step 3. When both are deployed, call `complete_onboarding_step` for
-   `function`; otherwise leave it open and tell the user workflows can run once it is done.
+   Report which titles are deployed and their sizes. If the command exits with `check failed`
+   (for example a `QiskitServerlessException` with `503`, a TLS error, or a timeout), the check
+   did not run: report the exact error and leave the `function` step open. Do not report the
+   titles as missing, and do not treat the user's confirmation as a substitute for this check.
+   A `503` from `qiskit-serverless.quantum.ibm.com` while `github.com` and `pypi.org` work is a
+   DAM egress-gateway problem, not a missing network allow: tell the user and suggest a new
+   session or a fresh agent. If a title prints `missing`, give the user the deploy instructions
+   from step 3. Call `complete_onboarding_step` for `function` only when both titles load;
+   otherwise leave it open and tell the user workflows can run once it is done.
 
-6. **Done.** Tell the user setup is complete and call `mark_onboarding_complete`. Explain that
-   workflows run on the Qiskit Function and that this agent's skills guide the next steps:
+6. **Done.** When the steps that could run are done, tell the user setup is complete and call
+   `mark_onboarding_complete`. If the `function` check failed or the functions are not deployed,
+   say setup is complete for everything else and leave that step open; don't mark it done just to
+   finish onboarding. Explain that workflows run on the Qiskit Function and that this agent's
+   skills guide the next steps:
    `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job, and
    `report-run` reports it; `connect-cluster` sets up the cluster satellite alternative. From
    lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function) and

@@ -42,3 +42,4 @@ Create an agent from the **Hamiltonian Simulations** kit (`lahs-workflows-runner
 
 This kit is public metadata only. It contains no pipeline code, scripts, skills, cluster
 configuration, or credentials.
+

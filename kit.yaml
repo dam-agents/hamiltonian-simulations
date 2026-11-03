@@ -64,9 +64,13 @@ egressRules:
     port: 443
   - host: quantum.cloud.ibm.com
     port: 443
+  - host: eu-de.quantum.cloud.ibm.com
+    port: 443
   - host: qiskit-serverless.quantum.ibm.com
     port: 443
   - host: s3.us-east.cloud-object-storage.appdomain.cloud
+    port: 443
+  - host: s3.eu-de.cloud-object-storage.appdomain.cloud
     port: 443
 
 # The first turn of a new agent. Every step in ONBOARDING.md is safe to re-run.
@@ -77,5 +81,7 @@ onboarding:
     ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
     repositories and install the tooling; then check GitHub access, guide the user
     through saving their IBM Quantum account (Qiskit Functions CRN and API key,
-    typed into a hidden prompt in the terminal), and confirm the deployed Qiskit
-    Functions. Explain the skills at the end.
+    typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and
+    confirm the deployed Qiskit Functions. Only mark the function step complete
+    after both titles load; leave it open on a network error or 503. Explain the
+    skills at the end.

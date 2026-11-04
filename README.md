@@ -17,14 +17,19 @@ In its first session, the agent:
 2. runs `~/work/lahs-agentic-workflows/bin/dam-setup setup`, which updates that checkout, clones
    `lahs-workflows` into `~/work/lahs-workflows`, and installs the minimal tooling environment;
 3. checks GitHub Enterprise access;
-4. guides you through saving your IBM Quantum account (Qiskit Functions CRN and API key) using
+4. has you add both skill sources and installs all seven skills (the kit's `skills:` entries may
+   only use sources that already exist);
+5. guides you through saving your IBM Quantum account (Qiskit Functions CRN and API key) using
    the session's terminal;
-5. confirms that the `lahs-workflows` Qiskit Functions are deployed.
+6. confirms that the `lahs-workflows` Qiskit Functions are deployed.
 
-The kit installs these skills:
+The kit declares these skills:
 
 - `connect-cluster`, `preflight`, `run-workflow`, `report-run` from `lahs-agentic-workflows`;
 - `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep` from `lahs-workflows`.
+
+If the platform did not install them at creation, onboarding has you add both sources and installs
+them.
 
 ## Before you start
 

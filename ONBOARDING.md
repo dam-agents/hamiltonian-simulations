@@ -11,10 +11,11 @@ alternative (`connect-cluster` skill).
 Follow these steps in order. If a step fails, resolve it before continuing. Never ask the user to
 share a token, API key or CRN-plus-key pair in chat, and never print or enter a key yourself.
 
-Call `set_onboarding_checklist` with four steps:
+Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both LAHS
   repositories on github.ibm.com";
+- id `skills`, label "Install the seven skills from both LAHS repositories";
 - id `account`, label "Save your IBM Quantum account (Qiskit Functions CRN and API key) in the
   session's terminal";
 - id `function`, label "Confirm the deployed Qiskit Functions (CPU and GPU)".
@@ -49,16 +50,32 @@ Call `set_onboarding_checklist` with four steps:
    both checks pass; do not bypass a failed check. When both pass, call
    `complete_onboarding_step` for `github`.
 
-3. **Qiskit Function.** Ask the user whether the `lahs-workflows` Qiskit Functions are deployed on
+3. **Install the skills.** The kit's `skills:` entries may install only from sources that already
+   exist; a user without them can get none of the seven. Check your available skill sources first.
+   If `https://github.ibm.com/LAHS/lahs-agentic-workflows` is missing, or
+   `https://github.ibm.com/LAHS/lahs-workflows/tree/main/.bob/skills` is missing, ask the user to
+   add it in DAM's **Skills → Add source**; reuse a source that already points at the same URL
+   rather than creating a duplicate. If the tree URL is rejected, add the repository URL with
+   `.bob/skills` as the source path. The user may also run `dam skill source add <url>` from their
+   machine. Then install all seven skills from those sources with your skill tools; skip any
+   already present:
+   - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`;
+   - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`.
+
+   If your harness has no skill tools, ask the user to turn the seven on in the Skills panel. When
+   all seven are installed, call `complete_onboarding_step` for `skills`; otherwise report which
+   are missing and leave it open.
+
+4. **Qiskit Function.** Ask the user whether the `lahs-workflows` Qiskit Functions are deployed on
    their IBM Quantum Functions instance, and ask them to confirm the titles: `lahs-workflows` (CPU)
    and `lahs-workflows-gpu` (GPU) by default.
-   - **Deployed:** note the titles they confirm and continue to step 4.
+   - **Deployed:** note the titles they confirm and continue to step 5.
    - **Not deployed:** tell the user to clone https://github.ibm.com/LAHS/lahs-workflows.git on
      their laptop and ask an agent there to "deploy the lahs-workflows Qiskit Functions for CPU
      and GPU" (the `run-qiskit-function` skill builds and deploys both). Do not build or deploy
-     from this sandbox. Continue with step 4; workflows can run once the functions are deployed.
+     from this sandbox. Continue with step 5; workflows can run once the functions are deployed.
 
-4. **IBM Quantum account.** The agent reaches the Qiskit Function with the user's own account: the
+5. **IBM Quantum account.** The agent reaches the Qiskit Function with the user's own account: the
    Qiskit Functions instance **CRN** and an IBM Cloud **API key**. The user types the key into a
    hidden prompt; it never goes through the chat. Never put the API key in `kit.yaml`, an agent
    environment variable, or chat: the kit is public and the running agent can read its environment.
@@ -93,7 +110,7 @@ Call `set_onboarding_checklist` with four steps:
    For the satellite alternative, the account lives on the satellite machine, not in this
    sandbox: the user runs `bin/qiskit-account` there, from their own checkout of this repository.
 
-5. **Check the deployed titles.** If the user said the functions are deployed, check the titles
+6. **Check the deployed titles.** If the user said the functions are deployed, check the titles
    they confirmed (replace them below if they differ from the defaults):
 
    ```bash
@@ -116,10 +133,10 @@ Call `set_onboarding_checklist` with four steps:
    A `503` from `qiskit-serverless.quantum.ibm.com` while `github.com` and `pypi.org` work is a
    DAM egress-gateway problem, not a missing network allow: tell the user and suggest a new
    session or a fresh agent. If a title prints `missing`, give the user the deploy instructions
-   from step 3. Call `complete_onboarding_step` for `function` only when both titles load;
+   from step 4. Call `complete_onboarding_step` for `function` only when both titles load;
    otherwise leave it open and tell the user workflows can run once it is done.
 
-6. **Done.** When the steps that could run are done, tell the user setup is complete and call
+7. **Done.** When the steps that could run are done, tell the user setup is complete and call
    `mark_onboarding_complete`. If the `function` check failed or the functions are not deployed,
    say setup is complete for everything else and leave that step open; don't mark it done just to
    finish onboarding. Explain that workflows run on the Qiskit Function and that this agent's

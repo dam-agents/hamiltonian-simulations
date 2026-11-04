@@ -24,7 +24,9 @@ connections:
     note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com.
 
 # The public kit repo has no skills of its own: install the agentic and
-# lahs-workflows skills from their GHE sources.
+# lahs-workflows skills from their GHE sources. The platform installs these only
+# from sources that already exist; ONBOARDING step 3 has the user add both sources
+# and installs all seven for a user who has neither.
 skills:
   - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
     name: connect-cluster
@@ -51,6 +53,8 @@ egressRules:
   - host: github.ibm.com
     port: 443
   - host: cdnjs.cloudflare.com
+    port: 443
+  - host: cdn.jsdelivr.net
     port: 443
   - host: cloud.ibm.com
     port: 443
@@ -79,8 +83,9 @@ onboarding:
     Read ONBOARDING.md in your home directory (the public kit seed) and follow it.
     First clone https://github.ibm.com/LAHS/lahs-agentic-workflows.git into
     ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
-    repositories and install the tooling; then check GitHub access, guide the user
-    through saving their IBM Quantum account (Qiskit Functions CRN and API key,
+    repositories and install the tooling; then check GitHub access, install the
+    seven skills from both repositories, guide the user through saving their IBM
+    Quantum account (Qiskit Functions CRN and API key,
     typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and
     confirm the deployed Qiskit Functions. Only mark the function step complete
     after both titles load; leave it open on a network error or 503. Explain the

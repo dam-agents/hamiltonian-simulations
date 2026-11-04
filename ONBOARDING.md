@@ -30,7 +30,10 @@ Call `set_onboarding_checklist` with five steps:
    ```
 
    `dam-setup` pulls `~/work/lahs-agentic-workflows` and `~/work/lahs-workflows` and installs the
-   minimal tooling env. Successful setup prints `dam-setup: ready`. If the clone or setup fails
+   minimal tooling env. In this sandbox use only `uv run --no-project --with …` for tooling; never
+   run bare `uv run`, `uv sync`, or `uv run workflow …` from `~/work/lahs-workflows`, because it
+   installs the full CUDA/torch/jax project env (~4.5 GB) and can fill the home disk. Successful
+   setup prints `dam-setup: ready`. If the clone or setup fails
    because github.ibm.com is unreachable, do step 2, grant the connection, and re-run step 1. If
    setup fails for another reason, report the error without exposing secrets and stop. When it
    prints `dam-setup: ready`, call `complete_onboarding_step` for `setup`.
@@ -52,13 +55,13 @@ Call `set_onboarding_checklist` with five steps:
 
 3. **Install the skills.** The kit's `skills:` entries may install only from sources that already
    exist; a user without them can get none of the seven. Check your available skill sources first.
-   If `https://github.ibm.com/LAHS/lahs-agentic-workflows` is missing, or
-   `https://github.ibm.com/LAHS/lahs-workflows/tree/main/.bob/skills` is missing, ask the user to
-   add it in DAM's **Skills → Add source**; reuse a source that already points at the same URL
-   rather than creating a duplicate. If the tree URL is rejected, add the repository URL with
-   `.bob/skills` as the source path. The user may also run `dam skill source add <url>` from their
-   machine. Then install all seven skills from those sources with your skill tools; skip any
-   already present:
+   If either repository source is missing — `https://github.ibm.com/LAHS/lahs-agentic-workflows`
+   or `https://github.ibm.com/LAHS/lahs-workflows` — ask the user to add it in DAM's
+   **Skills → Add source**; reuse a source that already points at the same URL rather than
+   creating a duplicate. Both repositories expose their skills under `skills/` at the repository
+   root, so the repository URL is the source; no subdirectory is needed. The user may also run
+   `dam skill source add <url>` from their machine. Then install all seven skills from those
+   sources with your skill tools; skip any already present:
    - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`;
    - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`.
 
@@ -145,4 +148,4 @@ Call `set_onboarding_checklist` with five steps:
    `report-run` reports it; `connect-cluster` sets up the cluster satellite alternative. From
    lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function) and
    `analyse-sweep`. If a skill is not listed, read its `SKILL.md` under
-   `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/.bob/skills/` instead.
+   `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/` instead.

@@ -51,31 +51,18 @@ seed:
 egressPreset: trusted
 egressRules:
   - host: github.ibm.com
-    port: 443
   - host: cdnjs.cloudflare.com
-    port: 443
   - host: cdn.jsdelivr.net
-    port: 443
   - host: cloud.ibm.com
-    port: 443
   - host: iam.cloud.ibm.com
-    port: 443
   - host: resource-controller.cloud.ibm.com
-    port: 443
   - host: api.global-search-tagging.cloud.ibm.com
-    port: 443
   - host: globalcatalog.cloud.ibm.com
-    port: 443
   - host: quantum.cloud.ibm.com
-    port: 443
   - host: eu-de.quantum.cloud.ibm.com
-    port: 443
   - host: qiskit-serverless.quantum.ibm.com
-    port: 443
   - host: s3.us-east.cloud-object-storage.appdomain.cloud
-    port: 443
   - host: s3.eu-de.cloud-object-storage.appdomain.cloud
-    port: 443
 
 # The first turn of a new agent. Every step in ONBOARDING.md is safe to re-run.
 onboarding:

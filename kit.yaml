@@ -27,8 +27,8 @@ connections:
 # lahs-workflows skills from their GHE sources. Both repositories expose their
 # skills under skills/ at the repository root, so each source is the repository
 # URL (no tree or subdirectory URL). The platform installs these only from
-# sources that already exist; ONBOARDING step 3 has the user add both sources
-# and installs all seven for a user who has neither.
+# sources that already exist; ONBOARDING step 3 installs all eight from them and
+# falls back to the cloned checkouts when a source is missing.
 skills:
   - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
     name: connect-cluster
@@ -44,6 +44,8 @@ skills:
     name: run-qiskit-function
   - source: https://github.ibm.com/LAHS/lahs-workflows
     name: analyse-sweep
+  - source: https://github.ibm.com/LAHS/lahs-workflows
+    name: run-research-study
 
 # Seed the public kit metadata; the GHE checkout is cloned by onboarding.
 seed:
@@ -74,7 +76,7 @@ onboarding:
     ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
     repositories and install the tooling; use only `uv run --no-project --with …` here and never
     bare `uv run`/`uv sync` from the checkout. Then check GitHub access, install the
-    seven skills from both repositories, guide the user through saving their IBM
+    eight skills from both repositories, guide the user through saving their IBM
     Quantum account (Qiskit Functions CRN and API key,
     typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and
     confirm the deployed Qiskit Functions. Only mark the function step complete

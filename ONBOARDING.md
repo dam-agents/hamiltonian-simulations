@@ -15,7 +15,7 @@ Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both LAHS
   repositories on github.ibm.com";
-- id `skills`, label "Install the seven skills from both LAHS repositories";
+- id `skills`, label "Set up the eight skills from both LAHS repositories";
 - id `account`, label "Save your IBM Quantum account (Qiskit Functions CRN and API key) in the
   session's terminal";
 - id `function`, label "Confirm the deployed Qiskit Functions (CPU and GPU)".
@@ -53,21 +53,25 @@ Call `set_onboarding_checklist` with five steps:
    both checks pass; do not bypass a failed check. When both pass, call
    `complete_onboarding_step` for `github`.
 
-3. **Install the skills.** The kit's `skills:` entries may install only from sources that already
-   exist; a user without them can get none of the seven. Check your available skill sources first.
-   If either repository source is missing — `https://github.ibm.com/LAHS/lahs-agentic-workflows`
-   or `https://github.ibm.com/LAHS/lahs-workflows` — ask the user to add it in DAM's
-   **Skills → Add source**; reuse a source that already points at the same URL rather than
-   creating a duplicate. Both repositories expose their skills under `skills/` at the repository
-   root, so the repository URL is the source; no subdirectory is needed. The user may also run
-   `dam skill source add <url>` from their machine. Then install all seven skills from those
-   sources with your skill tools; skip any already present:
+3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
+   exist. Check your available skill sources and the cloned checkouts first.
+   - If both repository sources exist — `https://github.ibm.com/LAHS/lahs-agentic-workflows` and
+     `https://github.ibm.com/LAHS/lahs-workflows` — install the eight skills from them with your
+     skill tools; skip any already present.
+   - If a source is missing, do not block onboarding: the same skills are already readable from
+     the checkouts at `~/work/lahs-agentic-workflows/skills/` and `~/work/lahs-workflows/skills/`.
+     Acknowledge that the source is missing, and mention that adding it in DAM's
+     **Skills → Add source** is optional (the repository URL is the source; both expose `skills/`
+     at the repository root). The user may also run `dam skill source add <url>` from their
+     machine.
+   The eight skills are:
    - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`;
-   - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`.
+   - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`,
+     `run-research-study`.
 
-   If your harness has no skill tools, ask the user to turn the seven on in the Skills panel. When
-   all seven are installed, call `complete_onboarding_step` for `skills`; otherwise report which
-   are missing and leave it open.
+   If your harness has no skill tools, read the `SKILL.md` files directly from the checkouts; that
+   is sufficient. Call `complete_onboarding_step` for `skills` when the skills are installed or
+   available from the cloned checkouts; otherwise report which are missing and leave it open.
 
 4. **Qiskit Function.** Ask the user whether the `lahs-workflows` Qiskit Functions are deployed on
    their IBM Quantum Functions instance, and ask them to confirm the titles: `lahs-workflows` (CPU)
@@ -93,7 +97,10 @@ Call `set_onboarding_checklist` with five steps:
       - **In DAM (no local terminal):** open the agent, start a new session with no messages, and
         choose **Terminal (browser)** beside the message box. Run the command there. If the hidden
         prompt does not appear, fall back to the local route below.
-      - **From their machine:** run `dam ssh connect <agent name>` for a plain shell. The UI's
+      - **From their machine:** run `dam ssh connect <this agent's name>` for a plain shell.
+        Replace the placeholder with this agent's own name — the sandbox exports it as
+        `$PLATFORM_AGENT_NAME` (run `echo $PLATFORM_AGENT_NAME`; if it is empty, `$HOSTNAME` is the
+        agent ID), so give the user the literal command, ready to copy-paste. The UI's
         **VS Code / Zed (local)** shows the same command; **Terminal (local)** shows `dam chat`,
         which attaches the harness TUI rather than a plain shell.
 
@@ -146,6 +153,7 @@ Call `set_onboarding_checklist` with five steps:
    skills guide the next steps:
    `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job, and
    `report-run` reports it; `connect-cluster` sets up the cluster satellite alternative. From
-   lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function) and
-   `analyse-sweep`. If a skill is not listed, read its `SKILL.md` under
-   `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/` instead.
+   lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function),
+   `analyse-sweep` and `run-research-study` (multi-run studies). If a skill is not listed, read
+   its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`
+   instead.

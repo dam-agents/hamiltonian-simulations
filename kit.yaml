@@ -59,6 +59,7 @@ seed:
 egressPreset: trusted
 egressRules:
   - host: github.ibm.com
+  - host: pubchem.ncbi.nlm.nih.gov
   - host: cdnjs.cloudflare.com
   - host: cdn.jsdelivr.net
   - host: cloud.ibm.com

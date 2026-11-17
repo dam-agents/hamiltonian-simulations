@@ -6,10 +6,14 @@ into the agent's home directory; the working `lahs-agentic-workflows` checkout i
 `~/work/lahs-agentic-workflows`, and `lahs-workflows` into `~/work/lahs-workflows`. Commands below
 run from `~/work/lahs-agentic-workflows` after step 1.
 
-> **Nomenclature:** `LAHS` is the GitHub Enterprise organization (`LAHS/lahs-agentic-workflows`,
-> `LAHS/lahs-workflows`). In user-facing text these two repositories are the **Hamiltonian Simulations
-> knowledge bases** — same code, same URLs, just the branded name. Treat “LAHS repositories”,
-> “Hamiltonian Simulations repos”, and “knowledge bases” as synonyms. Workflows run on the deployed
+> **Nomenclature:**
+> * `LAHS` is the GitHub Enterprise organization (`LAHS/lahs-agentic-workflows`,
+>   `LAHS/lahs-workflows`). In user-facing text these two repositories are the **Hamiltonian Simulations
+>   knowledge bases** — same code, same URLs, just the branded name. Treat “LAHS repositories”,
+>   “Hamiltonian Simulations repos”, and “knowledge bases” as synonyms.
+> * **Samples vs shots:** In user-facing text say **samples** (e.g. “samples per circuit”, “total samples”);
+>   internally the library, `quantum_circuit_run.shots`, and QPU budgets still use `shot`/`shots`.
+>   Never expose “shots” to users. Workflows run on the deployed
 `lahs-workflows` or `lahs-workflows-gpu` Qiskit Function on IBM Quantum; a cluster satellite is the
 alternative (`connect-cluster` skill).
 

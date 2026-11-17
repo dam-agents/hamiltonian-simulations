@@ -10,7 +10,7 @@ tagline: Run Hamiltonian simulation workflows on IBM Quantum hardware.
 description: >-
   Runs lahs-workflows pipelines on the deployed lahs-workflows Qiskit Function.
   Onboarding first clones the GHE checkout and runs bin/dam-setup to update both
-  repositories, then checks that the agent can read the LAHS repositories on
+  repositories, then checks that the agent can read the Hamiltonian Simulations knowledge bases on
   github.ibm.com, guides you through saving your IBM Quantum account and
   confirms the deployed functions.
 category: research
@@ -20,15 +20,17 @@ harnesses: [claude-code, codex, pi, bob]
 
 connections:
   - accepts: [github-enterprise]
-    required: true
-    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com.
+    required: false
+    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com. Not needed if you use the Object Storage mirror.
+  - accepts: [object-storage]
+    required: false
+    note: Read-only mirror of the Hamiltonian Simulations knowledge bases as tgz bundles (hs-distributions-bucket/hamiltonian-simulations-kit on s3.us-south.cloud-object-storage.appdomain.cloud). Used when github.ibm.com is not reachable. The agent never writes there; grant any Object Storage connection with that endpoint/bucket (name is auto-discovered by endpoint).
 
-# The public kit repo has no skills of its own: install the agentic and
-# lahs-workflows skills from their GHE sources. Both repositories expose their
-# skills under skills/ at the repository root, so each source is the repository
-# URL (no tree or subdirectory URL). The platform installs these only from
-# sources that already exist; ONBOARDING step 3 installs all nine from them and
-# falls back to the cloned checkouts when a source is missing.
+# The public kit repo has no skills of its own: the Hamiltonian Simulations knowledge bases are
+# provided by the GitHub Enterprise repositories. Both expose skills/ at the repository root, so
+# each source is the repository URL (no tree or subdirectory URL). The platform
+# installs these only from sources that already exist; ONBOARDING step 3 installs
+# all nine from them and falls back to the cloned checkouts when a source is missing.
 skills:
   - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
     name: connect-cluster
@@ -69,6 +71,7 @@ egressRules:
   - host: qiskit-serverless.quantum.ibm.com
   - host: s3.us-east.cloud-object-storage.appdomain.cloud
   - host: s3.eu-de.cloud-object-storage.appdomain.cloud
+  - host: s3.us-south.cloud-object-storage.appdomain.cloud
 
 # The first turn of a new agent. Every step in ONBOARDING.md is safe to re-run.
 onboarding:

@@ -4,7 +4,12 @@ The first session of an agent created from [`kit.yaml`](kit.yaml) follows this f
 agent up to run lahs-workflows. The public kit seeds only its `kit.yaml` and this `ONBOARDING.md`
 into the agent's home directory; the working `lahs-agentic-workflows` checkout is cloned into
 `~/work/lahs-agentic-workflows`, and `lahs-workflows` into `~/work/lahs-workflows`. Commands below
-run from `~/work/lahs-agentic-workflows` after step 1. Workflows run on the deployed
+run from `~/work/lahs-agentic-workflows` after step 1.
+
+> **Nomenclature:** `LAHS` is the GitHub Enterprise organization (`LAHS/lahs-agentic-workflows`,
+> `LAHS/lahs-workflows`). In user-facing text these two repositories are the **Hamiltonian Simulations
+> knowledge bases** — same code, same URLs, just the branded name. Treat “LAHS repositories”,
+> “Hamiltonian Simulations repos”, and “knowledge bases” as synonyms. Workflows run on the deployed
 `lahs-workflows` or `lahs-workflows-gpu` Qiskit Function on IBM Quantum; a cluster satellite is the
 alternative (`connect-cluster` skill).
 
@@ -13,15 +18,15 @@ share a token, API key or CRN-plus-key pair in chat, and never print or enter a 
 
 Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
-- id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both LAHS
-  repositories on github.ibm.com";
-- id `skills`, label "Set up the nine skills from both LAHS repositories";
+- id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both Hamiltonian Simulations
+  knowledge bases on github.ibm.com (or the Object Storage mirror)";
+- id `skills`, label "Set up the nine skills from both Hamiltonian Simulations knowledge bases";
 - id `account`, label "Save your IBM Quantum account (Qiskit Functions CRN and API key) in the
   session's terminal";
 - id `function`, label "Confirm the deployed Qiskit Functions (CPU and GPU)".
 
 1. **Clone and update the GHE checkout (first).** The public kit seed cannot contain the GHE
-   checkout, so clone it and run its setup:
+   checkout, so clone it and run its setup. `dam-setup` tries GitHub first, then the COS mirror.
 
    ```bash
    [ -d ~/work/lahs-agentic-workflows/.git ] \
@@ -30,28 +35,42 @@ Call `set_onboarding_checklist` with five steps:
    ```
 
    `dam-setup` pulls `~/work/lahs-agentic-workflows` and `~/work/lahs-workflows` and installs the
-   minimal tooling env. In this sandbox use only `uv run --no-project --with …` for tooling; never
+   minimal tooling env. It tries `git fetch`/`clone` from `github.ibm.com`; if that fails it falls
+   back to the read-only COS mirror (`s3://hs-distributions-bucket/hamiltonian-simulations-kit/`,
+   `aws s3 cp` + the granted Object Storage profile auto-discovered by endpoint — name can be anything).
+   The manifest is saved persistently to `~/work/hamiltonian-simulations-kit-manifest.json` (not `/tmp`,
+   which is cleared on hibernate). In this sandbox use only `uv run --no-project --with …` for tooling; never
    run bare `uv run`, `uv sync`, or `uv run workflow …` from `~/work/lahs-workflows`, because it
    installs the full CUDA/torch/jax project env (~4.5 GB) and can fill the home disk. Successful
-   setup prints `dam-setup: ready`. If the clone or setup fails
-   because github.ibm.com is unreachable, do step 2, grant the connection, and re-run step 1. If
-   setup fails for another reason, report the error without exposing secrets and stop. When it
-   prints `dam-setup: ready`, call `complete_onboarding_step` for `setup`.
+   setup prints `dam-setup: ready`. If the clone or setup fails because neither github.ibm.com nor
+   the COS mirror is reachable, do step 2, grant a GitHub Enterprise *or* Object Storage connection,
+   and re-run step 1. If setup fails for another reason, report the error without exposing secrets
+   and stop. When it prints `dam-setup: ready`, call `complete_onboarding_step` for `setup`.
 
-2. **GitHub access.** Run both:
+2. **GitHub or COS access.** The agent needs *one* of:
+   - **GitHub Enterprise** (preferred when available): read on both `LAHS/lahs-agentic-workflows`
+     and `LAHS/lahs-workflows` on `github.ibm.com`, or
+   - **Object Storage** mirror: read on `hs-distributions-bucket/hamiltonian-simulations-kit`
+     on `https://s3.us-south.cloud-object-storage.appdomain.cloud` (any connection name; `dam-setup`
+     finds it by endpoint via `aws s3 cp`, the agent never writes there).
+
+   Check what is granted:
 
    ```bash
    git ls-remote https://github.ibm.com/LAHS/lahs-agentic-workflows.git HEAD
    git ls-remote https://github.ibm.com/LAHS/lahs-workflows.git HEAD
    ```
 
-   Each command must print a commit hash. If either fails, name the repository whose access check
-   failed. For a connection or permissions issue, ask the user to grant this agent a GitHub
-   Enterprise connection with read access to both repositories under agent → Connections. If DAM
-   requests network approval, ask the user to approve github.ibm.com in DAM's Activity. Wait for
-   the user, then repeat both checks and re-run step 1 if the clone failed. Continue only after
-   both checks pass; do not bypass a failed check. When both pass, call
-   `complete_onboarding_step` for `github`.
+   Each command must print a commit hash *or* `~/work/hamiltonian-simulations-kit-manifest.json` must
+   exist from a COS fallback (`cat ~/work/hamiltonian-simulations-kit-manifest.json`). If both
+   `git ls-remote` fail and no manifest exists, name which path failed. For GitHub, ask the user to
+   grant a GitHub Enterprise connection with read access to both repositories under agent →
+   Connections; for COS, ask them to grant an Object Storage connection with endpoint
+   `https://s3.us-south.cloud-object-storage.appdomain.cloud` and bucket `hs-distributions-bucket`
+   (read-only). If DAM requests network approval, ask the user to approve `github.ibm.com` or
+   `s3.us-south.cloud-object-storage.appdomain.cloud` in DAM's Activity. Wait for the user, then repeat both checks and re-run step 1 if the
+   clone failed. Continue only after at least one path passes; do not bypass a failed check. When
+   either passes, call `complete_onboarding_step` for `github`.
 
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.

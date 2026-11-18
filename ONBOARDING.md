@@ -24,7 +24,7 @@ Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both Hamiltonian Simulations
   knowledge bases on github.ibm.com (or the Object Storage mirror)";
-- id `skills`, label "Set up the nine skills from both Hamiltonian Simulations knowledge bases";
+- id `skills`, label "Set up the ten skills from both Hamiltonian Simulations knowledge bases";
 - id `account`, label "Save your IBM Quantum account (Qiskit Functions CRN and API key) in the
   session's terminal";
 - id `function`, label "Confirm the deployed Qiskit Functions (CPU and GPU)".
@@ -79,7 +79,7 @@ Call `set_onboarding_checklist` with five steps:
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.
    - If both repository sources exist — `https://github.ibm.com/LAHS/lahs-agentic-workflows` and
-     `https://github.ibm.com/LAHS/lahs-workflows` — install the nine skills from them with your
+     `https://github.ibm.com/LAHS/lahs-workflows` — install the ten skills from them with your
      skill tools; skip any already present.
    - If a source exists but a listed skill is missing, refresh the source first (`dam skill source
      refresh <url>` drops its scan cache; the next catalog re-scans upstream), then install it.
@@ -89,10 +89,10 @@ Call `set_onboarding_checklist` with five steps:
      **Skills → Add source** is optional (the repository URL is the source; both expose `skills/`
      at the repository root). The user may also run `dam skill source add <url>` from their
      machine.
-   The nine skills are:
+   The ten skills are:
    - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`;
    - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`,
-     `run-research-study`, `build-surface-model`.
+     `run-research-study`, `build-surface-model`, `report-agent-issue`.
 
    If your harness has no skill tools, read the `SKILL.md` files directly from the checkouts; that
    is sufficient. Call `complete_onboarding_step` for `skills` when the skills are installed or
@@ -180,6 +180,11 @@ Call `set_onboarding_checklist` with five steps:
    `report-run` reports it; `connect-cluster` sets up the cluster satellite alternative. From
    lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function),
    `analyse-sweep`, `run-research-study` (multi-run studies) and `build-surface-model`
-   (slab/adsorbate geometries for periodic runs). If a skill is not listed, read
+   (slab/adsorbate geometries for periodic runs); `report-agent-issue` runs alongside them and
+   reports anything that goes wrong in a run as a GitHub issue (with a linked PR for a fix the run
+   already needed). In this sandbox it runs its bookkeeping with
+   `~/work/lahs-workflows/scripts/workflow-incident` (never `uv run workflow incident`), and
+   without write access to `LAHS/lahs-workflows` it keeps the reports in
+   `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. If a skill is not listed, read
    its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`
    instead.

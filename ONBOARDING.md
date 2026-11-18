@@ -188,7 +188,12 @@ Call `set_onboarding_checklist` with five steps:
    `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. The kit lets only
    reads reach github.ibm.com on their own: every write (a push, an issue, a comment, a PR, and
    the `gh` searches that go through GitHub's GraphQL API) waits for the user's approval in
-   DAM's Activity. Say so before the first one, and if an approval is declined, keep the
-   report and carry on. If a skill is not listed, read
+   DAM's Activity. Never let a pending approval stop the work: prepare every issue, comment,
+   PR body and commit locally as problems come up, and carry on with the run. Send the GitHub
+   writes together, in one batch at a natural pause or at the end of the session, in the
+   background with a time limit (a held request may hang until the user answers), and tell
+   the user just before that approvals are waiting in Activity. Anything declined or timed out
+   stays in `~/work/lahs-workflows/.agent-incidents/`: list it in the final message, and the
+   next session retries it. If a skill is not listed, read
    its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`
    instead.

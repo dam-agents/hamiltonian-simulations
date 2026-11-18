@@ -14,8 +14,8 @@ run from `~/work/lahs-agentic-workflows` after step 1.
 > * **Samples vs shots:** In user-facing text say **samples** (e.g. “samples per circuit”, “total samples”);
 >   internally the library, `quantum_circuit_run.shots`, and QPU budgets still use `shot`/`shots`.
 >   Never expose “shots” to users. Workflows run on the deployed
-`lahs-workflows` or `lahs-workflows-gpu` Qiskit Function on IBM Quantum; a cluster satellite is the
-alternative (`connect-cluster` skill).
+`lahs-workflows` or `lahs-workflows-gpu` Managed workflows on IBM Quantum; a cluster satellite is
+the secondary alternative (`connect-cluster` skill).
 
 Follow these steps in order. If a step fails, resolve it before continuing. Never ask the user to
 share a token, API key or CRN-plus-key pair in chat, and never print or enter a key yourself.
@@ -24,10 +24,10 @@ Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both Hamiltonian Simulations
   knowledge bases on github.ibm.com (or the Object Storage mirror)";
-- id `skills`, label "Set up the ten skills from both Hamiltonian Simulations knowledge bases";
-- id `account`, label "Save your IBM Quantum account (Qiskit Functions CRN and API key) in the
+- id `skills`, label "Set up the twelve skills from both Hamiltonian Simulations knowledge bases";
+- id `account`, label "Save your IBM Quantum account (Managed workflows CRN and API key) in the
   session's terminal";
-- id `function`, label "Confirm the deployed Qiskit Functions (CPU and GPU)".
+- id `function`, label "Confirm the deployed Managed workflows (CPU and GPU)".
 
 1. **Clone and update the GHE checkout (first).** The public kit seed cannot contain the GHE
    checkout, so clone it and run its setup. `dam-setup` tries GitHub first, then the COS mirror.
@@ -43,9 +43,11 @@ Call `set_onboarding_checklist` with five steps:
    back to the read-only COS mirror (`s3://hs-distributions-bucket/hamiltonian-simulations-kit/`,
    `aws s3 cp` + the granted Object Storage profile auto-discovered by endpoint — name can be anything).
    The manifest is saved persistently to `~/work/hamiltonian-simulations-kit-manifest.json` (not `/tmp`,
-   which is cleared on hibernate). In this sandbox use only `uv run --no-project --with …` for tooling; never
-   run bare `uv run`, `uv sync`, or `uv run workflow …` from `~/work/lahs-workflows`, because it
-   installs the full CUDA/torch/jax project env (~4.5 GB) and can fill the home disk. Successful
+   which is cleared on hibernate). In this sandbox use `uv run --no-project --with …` for tooling;
+   never install the execution env (`uv sync --extra core`/`--all-extras`) or run the pipeline
+   (`uv run workflow run/orchestrate/study run`) from `~/work/lahs-workflows`, because it pulls
+   the CUDA/torch/jax env (~2 GB) and can fill the home disk. A plain `uv sync` is the ~0.7 GB
+   planning env. Successful
    setup prints `dam-setup: ready`. If the clone or setup fails because neither github.ibm.com nor
    the COS mirror is reachable, do step 2, grant a GitHub Enterprise *or* Object Storage connection,
    and re-run step 1. If setup fails for another reason, report the error without exposing secrets
@@ -71,18 +73,15 @@ Call `set_onboarding_checklist` with five steps:
    grant a GitHub Enterprise connection with read access to both repositories under agent →
    Connections; for COS, ask them to grant an Object Storage connection with endpoint
    `https://s3.us-south.cloud-object-storage.appdomain.cloud` and bucket `hs-distributions-bucket`
-   (read-only). The kit already allows reading from `github.ibm.com`, so a network approval for
-   these checks should not be needed. If DAM still asks, ask the user to approve that one
-   request **once** in DAM's Activity, and **never the entire `github.ibm.com` host**: that
-   would let every write through to every repository. An approval for
-   `s3.us-south.cloud-object-storage.appdomain.cloud` is fine to approve. Wait for the user, then repeat both checks and re-run step 1 if the
+   (read-only). If DAM requests network approval, ask the user to approve `github.ibm.com` or
+   `s3.us-south.cloud-object-storage.appdomain.cloud` in DAM's Activity. Wait for the user, then repeat both checks and re-run step 1 if the
    clone failed. Continue only after at least one path passes; do not bypass a failed check. When
    either passes, call `complete_onboarding_step` for `github`.
 
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.
    - If both repository sources exist — `https://github.ibm.com/LAHS/lahs-agentic-workflows` and
-     `https://github.ibm.com/LAHS/lahs-workflows` — install the ten skills from them with your
+     `https://github.ibm.com/LAHS/lahs-workflows` — install the twelve skills from them with your
      skill tools; skip any already present.
    - If a source exists but a listed skill is missing, refresh the source first (`dam skill source
      refresh <url>` drops its scan cache; the next catalog re-scans upstream), then install it.
@@ -92,33 +91,34 @@ Call `set_onboarding_checklist` with five steps:
      **Skills → Add source** is optional (the repository URL is the source; both expose `skills/`
      at the repository root). The user may also run `dam skill source add <url>` from their
      machine.
-   The ten skills are:
-   - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`;
+   The twelve skills are:
+   - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`,
+     `agent-run-report`;
    - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`,
-     `run-research-study`, `build-surface-model`, `report-agent-issue`.
+     `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`.
 
    If your harness has no skill tools, read the `SKILL.md` files directly from the checkouts; that
    is sufficient. Call `complete_onboarding_step` for `skills` when the skills are installed or
    available from the cloned checkouts; otherwise report which are missing and leave it open.
 
-4. **Qiskit Function.** Ask the user whether the `lahs-workflows` Qiskit Functions are deployed on
-   their IBM Quantum Functions instance, and ask them to confirm the titles: `lahs-workflows` (CPU)
+4. **Managed workflows.** Ask the user whether the `lahs-workflows` deployments are running on
+   their Managed workflows instance, and ask them to confirm the titles: `lahs-workflows` (CPU)
    and `lahs-workflows-gpu` (GPU) by default.
    - **Deployed:** note the titles they confirm and continue to step 5.
    - **Not deployed:** tell the user to clone https://github.ibm.com/LAHS/lahs-workflows.git on
-     their laptop and ask an agent there to "deploy the lahs-workflows Qiskit Functions for CPU
+     their laptop and ask an agent there to "deploy the lahs-workflows Managed workflows for CPU
      and GPU" (the `run-qiskit-function` skill builds and deploys both). Do not build or deploy
-     from this sandbox. Continue with step 5; workflows can run once the functions are deployed.
+     from this sandbox. Continue with step 5; workflows can run once the deployments are live.
 
-5. **IBM Quantum account.** The agent reaches the Qiskit Function with the user's own account: the
-   Qiskit Functions instance **CRN** and an IBM Cloud **API key**. The user types the key into a
+5. **IBM Quantum account.** The agent reaches the Managed workflows with the user's own account: the
+   Managed workflows instance **CRN** and an IBM Cloud **API key**. The user types the key into a
    hidden prompt; it never goes through the chat. Never put the API key in `kit.yaml`, an agent
    environment variable, or chat: the kit is public and the running agent can read its environment.
    The hidden prompt is the only supported path. Tell the user, step by step:
 
    a. Get an API key at https://cloud.ibm.com/iam/apikeys → **Create** (keep it ready to paste),
-      and the CRN of the IBM Quantum instance that holds the Qiskit Functions (IBM Quantum
-      platform → Instances; the Functions instance, not a runtime-only one).
+      and the CRN of the IBM Quantum instance that holds the Managed workflows (IBM Quantum
+      platform → Instances; the Managed workflows instance, not a runtime-only one).
 
    b. Ask the user to run the command in a terminal that can show the hidden prompt. Give both
       routes:
@@ -136,7 +136,7 @@ Call `set_onboarding_checklist` with five steps:
       ~/work/lahs-agentic-workflows/bin/qiskit-account --name lahs-functions
       ```
 
-      Paste the API key at the hidden prompt, then pick the Functions instance from the list (or
+      Paste the API key at the hidden prompt, then pick the Managed workflows instance from the list (or
       pass `--instance <CRN>`). Wait until it prints `saved account`.
 
    c. Check it yourself: `~/work/lahs-agentic-workflows/bin/qiskit-account check` must list
@@ -145,10 +145,10 @@ Call `set_onboarding_checklist` with five steps:
       `InvalidAccountError` or timeout means a blocked host: ask the user to approve it in DAM's
       Activity, then retry. When it passes, call `complete_onboarding_step` for `account`.
 
-   For the satellite alternative, the account lives on the satellite machine, not in this
+   For the secondary satellite path, the account lives on the satellite machine, not in this
    sandbox: the user runs `bin/qiskit-account` there, from their own checkout of this repository.
 
-6. **Check the deployed titles.** If the user said the functions are deployed, check the titles
+6. **Check the deployed titles.** If the user said the deployments are live, check the titles
    they confirmed (replace them below if they differ from the defaults):
 
    ```bash
@@ -177,29 +177,14 @@ Call `set_onboarding_checklist` with five steps:
 7. **Done.** When the steps that could run are done, tell the user setup is complete and call
    `mark_onboarding_complete`. If the `function` check failed or the functions are not deployed,
    say setup is complete for everything else and leave that step open; don't mark it done just to
-   finish onboarding. Explain that workflows run on the Qiskit Function and that this agent's
+   finish onboarding. Explain that workflows run on the Managed workflows and that this agent's
    skills guide the next steps:
-   `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job, and
-   `report-run` reports it; `connect-cluster` sets up the cluster satellite alternative. From
-   lahs-workflows come `run-lahs-workflow`, `run-qiskit-function` (deploys the function),
-   `analyse-sweep`, `run-research-study` (multi-run studies) and `build-surface-model`
-   (slab/adsorbate geometries for periodic runs); `report-agent-issue` runs alongside them and
-   reports anything that goes wrong in a run as a GitHub issue (with a linked PR for a fix the run
-   already needed). In this sandbox it runs its bookkeeping with
-   `~/work/lahs-workflows/scripts/workflow-incident` (never `uv run workflow incident`), and
-   without write access to `LAHS/lahs-workflows` it keeps the reports in
-   `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. The kit lets reads and
-   writes to `LAHS/lahs-workflows` through on their own, as long as they use the REST API the
-   skill uses (`gh api repos/{owner}/{repo}/…`, never `gh issue`/`gh pr`). GitHub's GraphQL
-   API is refused, so `gh pr ready` is too: ask the user to press **Ready for review** on the
-   PR instead. **Write to no other repository.** A write to `LAHS/lahs-agentic-workflows` only
-   when the user asks for it: DAM holds it for their approval in Activity, and tell them to
-   approve it **once** (a plain approval permanently allows that request). Any other
-   repository, organisation or GitHub host is forbidden, even if a request would go through.
-   Never let a pending approval stop the work: send such a call in the background with a time
-   limit (a held request may hang until the user answers), tell the user an approval is
-   waiting, and carry on. Anything declined, refused or
-   timed out stays in `~/work/lahs-workflows/.agent-incidents/`: list it in the final message,
-   and the next session retries it. If a skill is not listed, read
+   `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job,
+   `report-run` publishes the science report, and `agent-run-report` publishes the operator
+   meta-report; `connect-cluster` sets up the secondary cluster path. From lahs-workflows come
+   `run-lahs-workflow`, `run-qiskit-function` (builds and deploys both titles), `analyse-sweep`,
+   `run-research-study` (multi-run studies), `build-surface-model` (slab/adsorbate geometries),
+   `report-agent-issue` (files problems as GitHub issues) and `request-skill` (turns a missing
+   procedure into a skill). If a skill is not listed, read
    its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`
    instead.

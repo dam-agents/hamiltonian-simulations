@@ -6,8 +6,8 @@ This repository is only the kit definition: [`kit.yaml`](kit.yaml) and
 [`ONBOARDING.md`](ONBOARDING.md). The Hamiltonian Simulations knowledge bases are provided by the
 GitHub Enterprise repositories:
 
-- [`lahs-agentic-workflows`](https://github.ibm.com/LAHS/lahs-agentic-workflows) — `connect-cluster`, `preflight`, `run-workflow`, `report-run`
-- [`lahs-workflows`](https://github.ibm.com/LAHS/lahs-workflows) — `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`, `run-research-study`, `build-surface-model`, `report-agent-issue`
+- [`lahs-agentic-workflows`](https://github.ibm.com/LAHS/lahs-agentic-workflows) — `connect-cluster`, `preflight`, `run-workflow`, `report-run`, `agent-run-report`
+- [`lahs-workflows`](https://github.ibm.com/LAHS/lahs-workflows) — `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`, `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`
 
 ## What it sets up
 
@@ -17,17 +17,18 @@ In its first session, the agent:
 2. runs `~/work/lahs-agentic-workflows/bin/dam-setup setup`, which updates that checkout, clones
    `lahs-workflows` into `~/work/lahs-workflows`, and installs the minimal tooling environment;
 3. checks access — GitHub Enterprise *or* the read-only COS mirror (`s3://hs-distributions-bucket/hamiltonian-simulations-kit/` on `s3.us-south.cloud-object-storage.appdomain.cloud`);
-4. installs all ten skills from both sources when they exist; if a source is missing, it notes
+4. installs all twelve skills from both sources when they exist; if a source is missing, it notes
    that the skills are still readable from the cloned checkouts and adding the source is optional;
-5. guides you through saving your IBM Quantum account (Qiskit Functions CRN and API key) using
+5. guides you through saving your IBM Quantum account (Managed workflows CRN and API key) using
    the session's terminal;
-6. confirms that the `lahs-workflows` Qiskit Functions are deployed.
+6. confirms that the `lahs-workflows` Managed workflows are deployed.
 
 The kit declares these skills:
 
-- `connect-cluster`, `preflight`, `run-workflow`, `report-run` from `lahs-agentic-workflows`;
+- `connect-cluster`, `preflight`, `run-workflow`, `report-run`, `agent-run-report` from
+  `lahs-agentic-workflows`;
 - `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`, `run-research-study`,
-  `build-surface-model`, `report-agent-issue` from `lahs-workflows`.
+  `build-surface-model`, `report-agent-issue`, `request-skill` from `lahs-workflows`.
 
 If the platform did not install them at creation, onboarding installs them from the two sources;
 if a source is missing, the same skills remain readable from the cloned checkouts, so adding the
@@ -36,17 +37,9 @@ source is optional.
 ## Before you start
 
 - Access to the Hamiltonian Simulations knowledge bases — either via `github.ibm.com` (GitHub Enterprise) *or* the read-only COS mirror `hs-distributions-bucket/hamiltonian-simulations-kit` on `s3.us-south.cloud-object-storage.appdomain.cloud`.
-- An IBM Quantum account with a Qiskit Functions instance (its CRN and an IBM Cloud API key).
-- The `lahs-workflows` (CPU) and `lahs-workflows-gpu` (GPU) Qiskit Functions deployed. If they are
+- An IBM Quantum account with a Managed workflows instance (its CRN and an IBM Cloud API key).
+- The `lahs-workflows` (CPU) and `lahs-workflows-gpu` (GPU) Managed workflows deployed. If they are
   not deployed, onboarding explains how to deploy them from a `lahs-workflows` checkout.
-
-On github.ibm.com the agent can read everything and write to `LAHS/lahs-workflows` (the
-issues, comments and draft pull requests of the `report-agent-issue` skill, and pushes of its
-`agent-fix/*` branches). A write to `LAHS/lahs-agentic-workflows` or any other repository
-waits for your approval in DAM's Activity: approve it **once**, because a plain approval
-permanently allows that request, and deny anything outside those two repositories. GitHub's
-GraphQL API is refused, so you mark the agent's pull requests ready for review yourself. The
-agent is also told never to write anywhere but `lahs-workflows` unless you ask.
 
 The API key is typed into a hidden prompt in the agent's terminal. Never put an API key,
 CRN-plus-key pair, or cluster credentials in this repository.

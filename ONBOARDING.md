@@ -185,6 +185,10 @@ Call `set_onboarding_checklist` with five steps:
    already needed). In this sandbox it runs its bookkeeping with
    `~/work/lahs-workflows/scripts/workflow-incident` (never `uv run workflow incident`), and
    without write access to `LAHS/lahs-workflows` it keeps the reports in
-   `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. If a skill is not listed, read
+   `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. The kit lets only
+   reads reach github.ibm.com on their own: every write (a push, an issue, a comment, a PR, and
+   the `gh` searches that go through GitHub's GraphQL API) waits for the user's approval in
+   DAM's Activity. Say so before the first one, and if an approval is declined, keep the
+   report and carry on. If a skill is not listed, read
    its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`
    instead.

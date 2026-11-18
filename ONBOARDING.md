@@ -71,8 +71,11 @@ Call `set_onboarding_checklist` with five steps:
    grant a GitHub Enterprise connection with read access to both repositories under agent →
    Connections; for COS, ask them to grant an Object Storage connection with endpoint
    `https://s3.us-south.cloud-object-storage.appdomain.cloud` and bucket `hs-distributions-bucket`
-   (read-only). If DAM requests network approval, ask the user to approve `github.ibm.com` or
-   `s3.us-south.cloud-object-storage.appdomain.cloud` in DAM's Activity. Wait for the user, then repeat both checks and re-run step 1 if the
+   (read-only). The kit already allows reading from `github.ibm.com`, so a network approval for
+   these checks should not be needed. If DAM still asks, ask the user to approve that one
+   request **once** in DAM's Activity, and **never the entire `github.ibm.com` host**: that
+   would let every write through to every repository. An approval for
+   `s3.us-south.cloud-object-storage.appdomain.cloud` is fine to approve. Wait for the user, then repeat both checks and re-run step 1 if the
    clone failed. Continue only after at least one path passes; do not bypass a failed check. When
    either passes, call `complete_onboarding_step` for `github`.
 

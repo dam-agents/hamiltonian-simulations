@@ -21,7 +21,7 @@ harnesses: [claude-code, codex, pi, bob]
 connections:
   - accepts: [github-enterprise]
     required: false
-    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com. Not needed if you use the Object Storage mirror.
+    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com. Not needed if you use the Object Storage mirror. Optional write access to LAHS/lahs-workflows (issues, pull requests, pushing agent-fix/* branches) lets the report-agent-issue skill file what goes wrong in a run; without it the agent keeps the reports in ~/work/lahs-workflows/.agent-incidents/ and tells you which are waiting. The kit lets writes reach LAHS/lahs-workflows; a write to LAHS/lahs-agentic-workflows or anywhere else waits for your approval in DAM's Activity, and the agent is told never to write anywhere else.
   - accepts: [object-storage]
     required: false
     note: Read-only mirror of the Hamiltonian Simulations knowledge bases as tgz bundles (hs-distributions-bucket/hamiltonian-simulations-kit on s3.us-south.cloud-object-storage.appdomain.cloud). Used when github.ibm.com is not reachable. The agent never writes there; grant any Object Storage connection with that endpoint/bucket (name is auto-discovered by endpoint).
@@ -30,7 +30,7 @@ connections:
 # provided by the GitHub Enterprise repositories. Both expose skills/ at the repository root, so
 # each source is the repository URL (no tree or subdirectory URL). The platform
 # installs these only from sources that already exist; ONBOARDING step 3 installs
-# all nine from them and falls back to the cloned checkouts when a source is missing.
+# all ten from them and falls back to the cloned checkouts when a source is missing.
 skills:
   - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
     name: connect-cluster
@@ -50,6 +50,8 @@ skills:
     name: run-research-study
   - source: https://github.ibm.com/LAHS/lahs-workflows
     name: build-surface-model
+  - source: https://github.ibm.com/LAHS/lahs-workflows
+    name: report-agent-issue
 
 # Seed the public kit metadata; the GHE checkout is cloned by onboarding.
 seed:
@@ -57,8 +59,44 @@ seed:
   into: home
 
 egressPreset: trusted
+# github.ibm.com: every read; writes to LAHS/lahs-workflows allowed; GraphQL denied; any other
+# write held for the user's approval. Clone/fetch is GET plus POST git-upload-pack.
+# report-agent-issue calls GitHub through REST (gh api), whose paths name the repository, so
+# its issues, comments, labels, PRs and pushes to lahs-workflows are allowed below. GraphQL
+# (/api/graphql) names no repository, so it is denied outright. A write to
+# LAHS/lahs-agentic-workflows, or anything else, matches no rule: DAM holds it for approval
+# in Activity (approve it "once"; a plain approval writes a permanent allow rule).
 egressRules:
   - host: github.ibm.com
+    method: GET
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /LAHS/*/git-upload-pack
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /LAHS/lahs-workflows.git/git-receive-pack
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/issues*
+  - host: github.ibm.com
+    method: PATCH
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/issues/*
+  - host: github.ibm.com
+    method: DELETE
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/issues/*/labels/*
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/pulls*
+  - host: github.ibm.com
+    method: PATCH
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/pulls/*
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /api/v3/repos/LAHS/lahs-workflows/labels
+  - host: github.ibm.com
+    method: POST
+    pathPattern: /api/graphql
+    verdict: deny
   - host: pubchem.ncbi.nlm.nih.gov
   - host: cdnjs.cloudflare.com
   - host: cdn.jsdelivr.net
@@ -82,7 +120,7 @@ onboarding:
     ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
     repositories and install the tooling; use only `uv run --no-project --with …` here and never
     bare `uv run`/`uv sync` from the checkout. Then check GitHub access, install the
-    nine skills from both repositories, guide the user through saving their IBM
+    ten skills from both repositories, guide the user through saving their IBM
     Quantum account (Qiskit Functions CRN and API key,
     typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and
     confirm the deployed Qiskit Functions. Only mark the function step complete

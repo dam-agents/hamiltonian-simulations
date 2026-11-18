@@ -40,10 +40,13 @@ source is optional.
 - The `lahs-workflows` (CPU) and `lahs-workflows-gpu` (GPU) Qiskit Functions deployed. If they are
   not deployed, onboarding explains how to deploy them from a `lahs-workflows` checkout.
 
-On github.ibm.com the agent can read, and write only to `LAHS/lahs-workflows` (the issues,
-comments and draft pull requests of the `report-agent-issue` skill, and pushes of its
-`agent-fix/*` branches). Any other write, including marking a pull request ready for review,
-waits for your approval in DAM's Activity; pushes to `lahs-agentic-workflows` are refused.
+On github.ibm.com the agent can read everything and write to `LAHS/lahs-workflows` (the
+issues, comments and draft pull requests of the `report-agent-issue` skill, and pushes of its
+`agent-fix/*` branches). A write to `LAHS/lahs-agentic-workflows` or any other repository
+waits for your approval in DAM's Activity: approve it **once**, because a plain approval
+permanently allows that request, and deny anything outside those two repositories. GitHub's
+GraphQL API is refused, so you mark the agent's pull requests ready for review yourself. The
+agent is also told never to write anywhere but `lahs-workflows` unless you ask.
 
 The API key is typed into a hidden prompt in the agent's terminal. Never put an API key,
 CRN-plus-key pair, or cluster credentials in this repository.

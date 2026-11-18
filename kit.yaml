@@ -21,7 +21,7 @@ harnesses: [claude-code, codex, pi, bob]
 connections:
   - accepts: [github-enterprise]
     required: false
-    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com. Not needed if you use the Object Storage mirror. Optional write access to LAHS/lahs-workflows (issues, pull requests, pushing agent-fix/* branches) lets the report-agent-issue skill file what goes wrong in a run; without it the agent keeps the reports in ~/work/lahs-workflows/.agent-incidents/ and tells you which are waiting. The kit lets writes reach LAHS/lahs-workflows only; any other write to github.ibm.com waits for your approval in DAM's Activity.
+    note: Requires read access to LAHS/lahs-agentic-workflows and LAHS/lahs-workflows on github.ibm.com. Not needed if you use the Object Storage mirror. Optional write access to LAHS/lahs-workflows (issues, pull requests, pushing agent-fix/* branches) lets the report-agent-issue skill file what goes wrong in a run; without it the agent keeps the reports in ~/work/lahs-workflows/.agent-incidents/ and tells you which are waiting. The kit lets writes reach LAHS/lahs-workflows; a write to LAHS/lahs-agentic-workflows or anywhere else waits for your approval in DAM's Activity, and the agent is told never to write anywhere else.
   - accepts: [object-storage]
     required: false
     note: Read-only mirror of the Hamiltonian Simulations knowledge bases as tgz bundles (hs-distributions-bucket/hamiltonian-simulations-kit on s3.us-south.cloud-object-storage.appdomain.cloud). Used when github.ibm.com is not reachable. The agent never writes there; grant any Object Storage connection with that endpoint/bucket (name is auto-discovered by endpoint).
@@ -59,11 +59,13 @@ seed:
   into: home
 
 egressPreset: trusted
-# github.ibm.com: every read, and writes to LAHS/lahs-workflows only. Clone/fetch is GET plus
-# POST git-upload-pack. report-agent-issue calls GitHub through REST (gh api), whose paths
-# name the repository, so its issues, comments, labels, PRs and pushes to lahs-workflows are
-# allowed below. Anything else that writes (another repository, /api/graphql such as
-# `gh pr ready`) matches no rule, so DAM holds it for the user's approval in Activity.
+# github.ibm.com: every read; writes to LAHS/lahs-workflows allowed; GraphQL denied; any other
+# write held for the user's approval. Clone/fetch is GET plus POST git-upload-pack.
+# report-agent-issue calls GitHub through REST (gh api), whose paths name the repository, so
+# its issues, comments, labels, PRs and pushes to lahs-workflows are allowed below. GraphQL
+# (/api/graphql) names no repository, so it is denied outright. A write to
+# LAHS/lahs-agentic-workflows, or anything else, matches no rule: DAM holds it for approval
+# in Activity (approve it "once"; a plain approval writes a permanent allow rule).
 egressRules:
   - host: github.ibm.com
     method: GET
@@ -93,7 +95,7 @@ egressRules:
     pathPattern: /api/v3/repos/LAHS/lahs-workflows/labels
   - host: github.ibm.com
     method: POST
-    pathPattern: /LAHS/lahs-agentic-workflows.git/git-receive-pack
+    pathPattern: /api/graphql
     verdict: deny
   - host: pubchem.ncbi.nlm.nih.gov
   - host: cdnjs.cloudflare.com

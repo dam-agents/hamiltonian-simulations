@@ -187,11 +187,15 @@ Call `set_onboarding_checklist` with five steps:
    without write access to `LAHS/lahs-workflows` it keeps the reports in
    `~/work/lahs-workflows/.agent-incidents/` and says which are waiting. The kit lets reads and
    writes to `LAHS/lahs-workflows` through on their own, as long as they use the REST API the
-   skill uses (`gh api repos/{owner}/{repo}/…`, never `gh issue`/`gh pr`); every other write
-   to github.ibm.com (another repository, or `gh pr ready`, the one GraphQL call) waits for
-   the user's approval in DAM's Activity. Never let a pending approval stop the work: send
-   such a call in the background with a time limit (a held request may hang until the user
-   answers), tell the user an approval is waiting, and carry on. Anything declined, refused or
+   skill uses (`gh api repos/{owner}/{repo}/…`, never `gh issue`/`gh pr`). GitHub's GraphQL
+   API is refused, so `gh pr ready` is too: ask the user to press **Ready for review** on the
+   PR instead. **Write to no other repository.** A write to `LAHS/lahs-agentic-workflows` only
+   when the user asks for it: DAM holds it for their approval in Activity, and tell them to
+   approve it **once** (a plain approval permanently allows that request). Any other
+   repository, organisation or GitHub host is forbidden, even if a request would go through.
+   Never let a pending approval stop the work: send such a call in the background with a time
+   limit (a held request may hang until the user answers), tell the user an approval is
+   waiting, and carry on. Anything declined, refused or
    timed out stays in `~/work/lahs-workflows/.agent-incidents/`: list it in the final message,
    and the next session retries it. If a skill is not listed, read
    its `SKILL.md` under `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`

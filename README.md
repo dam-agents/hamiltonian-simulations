@@ -7,7 +7,7 @@ This repository is only the kit definition: [`kit.yaml`](kit.yaml) and
 GitHub Enterprise repositories:
 
 - [`lahs-agentic-workflows`](https://github.ibm.com/LAHS/lahs-agentic-workflows) — `connect-cluster`, `preflight`, `run-workflow`, `report-run`, `agent-run-report`
-- [`lahs-workflows`](https://github.ibm.com/LAHS/lahs-workflows) — `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`, `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`
+- [`lahs-workflows`](https://github.ibm.com/LAHS/lahs-workflows) — `run-lahs-workflow`, `run-managed-workflow`, `analyse-sweep`, `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`
 
 ## What it sets up
 
@@ -19,15 +19,15 @@ In its first session, the agent:
 3. checks access — GitHub Enterprise *or* the read-only COS mirror (`s3://hs-distributions-bucket/hamiltonian-simulations-kit/` on `s3.us-south.cloud-object-storage.appdomain.cloud`);
 4. installs all twelve skills from both sources when they exist; if a source is missing, it notes
    that the skills are still readable from the cloned checkouts and adding the source is optional;
-5. guides you through saving your IBM Quantum account (Managed workflows CRN and API key) using
+5. guides you through saving your IBM Quantum account (managed workflows instance CRN and API key) using
    the session's terminal;
-6. confirms that the `lahs-workflows` Managed workflows are deployed.
+6. confirms that the `lahs-workflows` IBM Quantum managed workflows are deployed.
 
 The kit declares these skills:
 
 - `connect-cluster`, `preflight`, `run-workflow`, `report-run`, `agent-run-report` from
   `lahs-agentic-workflows`;
-- `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`, `run-research-study`,
+- `run-lahs-workflow`, `run-managed-workflow`, `analyse-sweep`, `run-research-study`,
   `build-surface-model`, `report-agent-issue`, `request-skill` from `lahs-workflows`.
 
 If the platform did not install them at creation, onboarding installs them from the two sources;
@@ -37,8 +37,8 @@ source is optional.
 ## Before you start
 
 - Access to the Hamiltonian Simulations knowledge bases — either via `github.ibm.com` (GitHub Enterprise) *or* the read-only COS mirror `hs-distributions-bucket/hamiltonian-simulations-kit` on `s3.us-south.cloud-object-storage.appdomain.cloud`.
-- An IBM Quantum account with a Managed workflows instance (its CRN and an IBM Cloud API key).
-- The `lahs-workflows` (CPU) and `lahs-workflows-gpu` (GPU) Managed workflows deployed. If they are
+- An IBM Quantum account with a managed workflows instance (its CRN and an IBM Cloud API key).
+- The `lahs-workflows` (CPU) and `lahs-workflows-gpu` (GPU) IBM Quantum managed workflows deployed. If they are
   not deployed, onboarding explains how to deploy them from a `lahs-workflows` checkout.
 
 The API key is typed into a hidden prompt in the agent's terminal. Never put an API key,

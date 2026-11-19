@@ -13,9 +13,11 @@ run from `~/work/lahs-agentic-workflows` after step 1.
 >   “Hamiltonian Simulations repos”, and “knowledge bases” as synonyms.
 > * **Samples vs shots:** In user-facing text say **samples** (e.g. “samples per circuit”, “total samples”);
 >   internally the library, `quantum_circuit_run.shots`, and QPU budgets still use `shot`/`shots`.
->   Never expose “shots” to users. Workflows run on the deployed
-`lahs-workflows` or `lahs-workflows-gpu` Managed workflows on IBM Quantum; a cluster satellite is
-the secondary alternative (`connect-cluster` skill).
+>   Never expose “shots” to users.
+> * **IBM Quantum managed workflows, not “Qiskit Functions”:** workflows run on the deployed
+>   `lahs-workflows` or `lahs-workflows-gpu` IBM Quantum managed workflows; never call the offering
+>   “Qiskit Functions” (that now names the catalog service) or “formerly …”. A cluster satellite is
+>   the secondary alternative (`connect-cluster` skill).
 
 Follow these steps in order. If a step fails, resolve it before continuing. Never ask the user to
 share a token, API key or CRN-plus-key pair in chat, and never print or enter a key yourself.
@@ -25,9 +27,9 @@ Call `set_onboarding_checklist` with five steps:
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both Hamiltonian Simulations
   knowledge bases on github.ibm.com (or the Object Storage mirror)";
 - id `skills`, label "Set up the twelve skills from both Hamiltonian Simulations knowledge bases";
-- id `account`, label "Save your IBM Quantum account (Managed workflows CRN and API key) in the
+- id `account`, label "Save your IBM Quantum account (managed workflows instance CRN and API key) in the
   session's terminal";
-- id `function`, label "Confirm the deployed Managed workflows (CPU and GPU)".
+- id `function`, label "Confirm the deployed IBM Quantum managed workflows (CPU and GPU)".
 
 1. **Clone and update the GHE checkout (first).** The public kit seed cannot contain the GHE
    checkout, so clone it and run its setup. `dam-setup` tries GitHub first, then the COS mirror.
@@ -94,31 +96,31 @@ Call `set_onboarding_checklist` with five steps:
    The twelve skills are:
    - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`,
      `agent-run-report`;
-   - `lahs-workflows`: `run-lahs-workflow`, `run-qiskit-function`, `analyse-sweep`,
+   - `lahs-workflows`: `run-lahs-workflow`, `run-managed-workflow`, `analyse-sweep`,
      `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`.
 
    If your harness has no skill tools, read the `SKILL.md` files directly from the checkouts; that
    is sufficient. Call `complete_onboarding_step` for `skills` when the skills are installed or
    available from the cloned checkouts; otherwise report which are missing and leave it open.
 
-4. **Managed workflows.** Ask the user whether the `lahs-workflows` deployments are running on
-   their Managed workflows instance, and ask them to confirm the titles: `lahs-workflows` (CPU)
-   and `lahs-workflows-gpu` (GPU) by default.
+4. **IBM Quantum managed workflows.** Ask the user whether the `lahs-workflows` deployments are
+   running on their managed workflows instance, and ask them to confirm the titles: `lahs-workflows`
+   (CPU) and `lahs-workflows-gpu` (GPU) by default.
    - **Deployed:** note the titles they confirm and continue to step 5.
    - **Not deployed:** tell the user to clone https://github.ibm.com/LAHS/lahs-workflows.git on
-     their laptop and ask an agent there to "deploy the lahs-workflows Managed workflows for CPU
-     and GPU" (the `run-qiskit-function` skill builds and deploys both). Do not build or deploy
+     their laptop and ask an agent there to "deploy the lahs-workflows IBM Quantum managed workflows
+     for CPU and GPU" (the `run-managed-workflow` skill builds and deploys both). Do not build or deploy
      from this sandbox. Continue with step 5; workflows can run once the deployments are live.
 
-5. **IBM Quantum account.** The agent reaches the Managed workflows with the user's own account: the
-   Managed workflows instance **CRN** and an IBM Cloud **API key**. The user types the key into a
-   hidden prompt; it never goes through the chat. Never put the API key in `kit.yaml`, an agent
+5. **IBM Quantum account.** The agent reaches IBM Quantum managed workflows with the user's own
+   account: the managed workflows instance **CRN** and an IBM Cloud **API key**. The user types the
+   key into a hidden prompt; it never goes through the chat. Never put the API key in `kit.yaml`, an agent
    environment variable, or chat: the kit is public and the running agent can read its environment.
    The hidden prompt is the only supported path. Tell the user, step by step:
 
    a. Get an API key at https://cloud.ibm.com/iam/apikeys → **Create** (keep it ready to paste),
-      and the CRN of the IBM Quantum instance that holds the Managed workflows (IBM Quantum
-      platform → Instances; the Managed workflows instance, not a runtime-only one).
+      and the CRN of the IBM Quantum instance that holds IBM Quantum managed workflows (IBM Quantum
+      platform → Instances; the managed workflows instance, not a runtime-only one).
 
    b. Ask the user to run the command in a terminal that can show the hidden prompt. Give both
       routes:
@@ -136,7 +138,7 @@ Call `set_onboarding_checklist` with five steps:
       ~/work/lahs-agentic-workflows/bin/qiskit-account --name lahs-functions
       ```
 
-      Paste the API key at the hidden prompt, then pick the Managed workflows instance from the list (or
+      Paste the API key at the hidden prompt, then pick the managed workflows instance from the list (or
       pass `--instance <CRN>`). Wait until it prints `saved account`.
 
    c. Check it yourself: `~/work/lahs-agentic-workflows/bin/qiskit-account check` must list
@@ -175,14 +177,14 @@ Call `set_onboarding_checklist` with five steps:
    otherwise leave it open and tell the user workflows can run once it is done.
 
 7. **Done.** When the steps that could run are done, tell the user setup is complete and call
-   `mark_onboarding_complete`. If the `function` check failed or the functions are not deployed,
-   say setup is complete for everything else and leave that step open; don't mark it done just to
-   finish onboarding. Explain that workflows run on the Managed workflows and that this agent's
-   skills guide the next steps:
+   `mark_onboarding_complete`. If the `function` check failed or IBM Quantum managed workflows are
+   not deployed, say setup is complete for everything else and leave that step open; don't mark it
+   done just to finish onboarding. Explain that workflows run on IBM Quantum managed workflows and
+   that this agent's skills guide the next steps:
    `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job,
    `report-run` publishes the science report, and `agent-run-report` publishes the operator
    meta-report; `connect-cluster` sets up the secondary cluster path. From lahs-workflows come
-   `run-lahs-workflow`, `run-qiskit-function` (builds and deploys both titles), `analyse-sweep`,
+   `run-lahs-workflow`, `run-managed-workflow` (builds and deploys both titles), `analyse-sweep`,
    `run-research-study` (multi-run studies), `build-surface-model` (slab/adsorbate geometries),
    `report-agent-issue` (files problems as GitHub issues) and `request-skill` (turns a missing
    procedure into a skill). If a skill is not listed, read

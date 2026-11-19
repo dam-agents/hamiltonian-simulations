@@ -8,11 +8,11 @@ id: lahs-workflows-runner
 name: Hamiltonian Simulations
 tagline: Run Hamiltonian simulation workflows on IBM Quantum hardware.
 description: >-
-  Runs lahs-workflows pipelines on the deployed lahs-workflows Managed workflows.
+  Runs lahs-workflows pipelines on the deployed lahs-workflows IBM Quantum managed workflows.
   Onboarding first clones the GHE checkout and runs bin/dam-setup to update both
   repositories, then checks that the agent can read the Hamiltonian Simulations knowledge bases on
   github.ibm.com, guides you through saving your IBM Quantum account and
-  confirms the deployed functions.
+  confirms the deployed IBM Quantum managed workflows.
 category: research
 icon: microscope
 docsUrl: https://github.ibm.com/LAHS/lahs-agentic-workflows
@@ -45,7 +45,7 @@ skills:
   - source: https://github.ibm.com/LAHS/lahs-workflows
     name: run-lahs-workflow
   - source: https://github.ibm.com/LAHS/lahs-workflows
-    name: run-qiskit-function
+    name: run-managed-workflow
   - source: https://github.ibm.com/LAHS/lahs-workflows
     name: analyse-sweep
   - source: https://github.ibm.com/LAHS/lahs-workflows
@@ -110,8 +110,8 @@ onboarding:
     install the execution env (`uv sync --extra core`/`--all-extras`) or run the pipeline from the
     checkout. Then check GitHub access, install the twelve skills from both repositories, guide
     the user through saving their IBM
-    Quantum account (Managed workflows CRN and API key,
+    Quantum account (managed workflows instance CRN and API key,
     typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and
-    confirm the deployed Managed workflows. Only mark the function step complete
+    confirm the deployed IBM Quantum managed workflows. Only mark the function step complete
     after both titles load; leave it open on a network error or 503. Explain the
     skills at the end.

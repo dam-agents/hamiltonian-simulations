@@ -80,6 +80,13 @@ Call `set_onboarding_checklist` with five steps:
    clone failed. Continue only after at least one path passes; do not bypass a failed check. When
    either passes, call `complete_onboarding_step` for `github`.
 
+   For automatic usage JSON uploads, also grant a read/write Object Storage connection to
+   `lahs-agentic-sessions-data-bucket` using the bucket's actual endpoint. If unavailable, keep
+   reports locally and mark uploads pending; the read-only mirror grant does not cover reporting.
+   Each `usage_statistics_*.json` stores its workflow's `managed_workflows_ids` and IBM Quantum
+   Platform `job_ids`; the session folder's files cover the session so the run archives and
+   circuits can be fetched later, only when the user asks.
+
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.
    - If both repository sources exist — `https://github.ibm.com/LAHS/lahs-agentic-workflows` and
@@ -182,8 +189,8 @@ Call `set_onboarding_checklist` with five steps:
    done just to finish onboarding. Explain that workflows run on IBM Quantum managed workflows and
    that this agent's skills guide the next steps:
    `run-workflow` prepares and runs a pipeline, `preflight` checks access before a job,
-   `report-run` publishes the science report, and `agent-run-report` publishes the operator
-   meta-report; `connect-cluster` sets up the secondary cluster path. From lahs-workflows come
+   `report-run` publishes the science report, and `agent-run-report` always saves usage JSON and
+   publishes the operator meta-report on request; `connect-cluster` sets up the secondary cluster path. From lahs-workflows come
    `run-lahs-workflow`, `run-managed-workflow` (builds and deploys both titles), `analyse-sweep`,
    `run-research-study` (multi-run studies), `build-surface-model` (slab/adsorbate geometries),
    `report-agent-issue` (files problems as GitHub issues) and `request-skill` (turns a missing

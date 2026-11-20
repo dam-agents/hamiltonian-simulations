@@ -49,7 +49,9 @@ Call `set_onboarding_checklist` with five steps:
    never install the execution env (`uv sync --extra core`/`--all-extras`) or run the pipeline
    (`uv run workflow run/orchestrate/study run`) from `~/work/lahs-workflows`, because it pulls
    the CUDA/torch/jax env (~2 GB) and can fill the home disk. A plain `uv sync` is the ~0.7 GB
-   planning env. Successful
+   planning env. Setup also checks the AWS CLI profiles for the code, issues and reports buckets.
+   The code and issues buckets are optional while `github.ibm.com` works; without the reports
+   bucket, usage reports stay local. Warnings do not fail setup. Successful
    setup prints `dam-setup: ready`. If the clone or setup fails because neither github.ibm.com nor
    the COS mirror is reachable, do step 2, grant a GitHub Enterprise *or* Object Storage connection,
    and re-run step 1. If setup fails for another reason, report the error without exposing secrets

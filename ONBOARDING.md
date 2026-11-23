@@ -118,8 +118,9 @@ Call `set_onboarding_checklist` with five steps:
    - **Deployed:** note the titles they confirm and continue to step 5.
    - **Not deployed:** tell the user to clone https://github.ibm.com/LAHS/lahs-workflows.git on
      their laptop and ask an agent there to "deploy the lahs-workflows IBM Quantum managed workflows
-     for CPU and GPU" (the `run-managed-workflow` skill builds and deploys both). Do not build or deploy
-     from this sandbox. Continue with step 5; workflows can run once the deployments are live.
+     for CPU and GPU" (the `run-managed-workflow` skill builds and deploys both; the laptop needs
+     Docker, for example Rancher Desktop or Colima). Do not build or deploy from this sandbox.
+     Continue with step 5; workflows can run once the deployments are live.
 
 5. **IBM Quantum account.** The agent reaches IBM Quantum managed workflows with the user's own
    account: the managed workflows instance **CRN** and an IBM Cloud **API key**. The user types the

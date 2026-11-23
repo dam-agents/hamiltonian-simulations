@@ -4,7 +4,7 @@
 # lahs-agentic-workflows into ~/work/lahs-agentic-workflows and runs
 # bin/dam-setup setup there; the GHE skills are installed from that repo.
 schemaVersion: v1
-id: lahs-workflows-runner
+id: hs-workflows-runner
 name: Hamiltonian Simulations
 tagline: Run Hamiltonian simulation workflows on IBM Quantum hardware.
 description: >-

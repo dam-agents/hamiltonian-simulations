@@ -46,7 +46,7 @@ CRN-plus-key pair, or cluster credentials in this repository.
 
 ## Use it
 
-Create an agent from the **Hamiltonian Simulations** kit (`lahs-workflows-runner`) and follow its first-session onboarding.
+Create an agent from the **Hamiltonian Simulations** kit (`hs-workflows-runner`) and follow its first-session onboarding.
 
 This kit is public metadata only. It contains no pipeline code, scripts, skills, cluster
 configuration, or credentials.

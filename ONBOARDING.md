@@ -3,7 +3,8 @@
 The first session of an agent created from [`kit.yaml`](kit.yaml) follows this file to set the
 agent up to run lahs-workflows. The public kit seeds only its `kit.yaml` and this `ONBOARDING.md`
 into the agent's home directory; the working `lahs-agentic-workflows` checkout is cloned into
-`~/work/lahs-agentic-workflows`, and `lahs-workflows` into `~/work/lahs-workflows`. Commands below
+`~/work/lahs-agentic-workflows`, and `lahs-workflows` into `~/work/lahs-workflows`. The Qiskit
+skills are installed by DAM from `https://github.com/Qiskit/skills`. Commands below
 run from `~/work/lahs-agentic-workflows` after step 1.
 
 > **Nomenclature:**
@@ -26,7 +27,7 @@ Call `set_onboarding_checklist` with five steps:
 - id `setup`, label "Clone lahs-agentic-workflows into ~/work and update both repos (bin/dam-setup setup)";
 - id `github`, label "Grant this agent a GitHub Enterprise connection with read access to both Hamiltonian Simulations
   knowledge bases on github.ibm.com (or the Object Storage mirror)";
-- id `skills`, label "Set up the twelve skills from both Hamiltonian Simulations knowledge bases";
+- id `skills`, label "Set up the fifteen skills from the knowledge bases and Qiskit";
 - id `account`, label "Save your IBM Quantum account (managed workflows instance CRN and API key) in the
   session's terminal";
 - id `function`, label "Confirm the deployed IBM Quantum managed workflows (CPU and GPU)".
@@ -91,26 +92,53 @@ Call `set_onboarding_checklist` with five steps:
 
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.
-   - If both repository sources exist — `https://github.ibm.com/LAHS/lahs-agentic-workflows` and
-     `https://github.ibm.com/LAHS/lahs-workflows` — install the twelve skills from them with your
-     skill tools; skip any already present.
+   - Automatically register `https://github.com/Qiskit/skills` if it is missing. Use your skill
+     source tools to check and register it; if those tools are unavailable, run
+     `dam skill source list --json` and, only when the source is absent,
+     `dam skill source add https://github.com/Qiskit/skills --json` in this sandbox. Re-check the
+     sources after adding it. Skip registration when the source already exists; adding it again
+     can shadow an existing source. The kit declares the three skills; onboarding registers their
+     source without a separate user step. If tools or CLI access prevent registration, report
+     the error and ask the user to add the source in **Skills → Add source — DAM web UI**;
+     leave the skills step open until it is available. Never run a login yourself.
+     Enable only `select-error-mitigation`, `simulate-fermionic-systems` and
+     `managed-workflows-quickstart` from this source.
+   - Install each available source's listed skills below with your skill tools; skip any
+     already present. The Hamiltonian Simulations sources are
+     `https://github.ibm.com/LAHS/lahs-agentic-workflows` and `https://github.ibm.com/LAHS/lahs-workflows`.
    - If a source exists but a listed skill is missing, refresh the source first (`dam skill source
      refresh <url>` drops its scan cache; the next catalog re-scans upstream), then install it.
-   - If a source is missing, do not block onboarding: the same skills are already readable from
-     the checkouts at `~/work/lahs-agentic-workflows/skills/` and `~/work/lahs-workflows/skills/`.
+   - If either Hamiltonian Simulations source is missing, do not block onboarding: its skills
+     are already readable from `~/work/lahs-agentic-workflows/skills/` or `~/work/lahs-workflows/skills/`.
      Acknowledge that the source is missing, and mention that adding it in DAM's
-     **Skills → Add source** is optional (the repository URL is the source; both expose `skills/`
-     at the repository root). The user may also run `dam skill source add <url>` from their
-     machine.
-   The twelve skills are:
+     **Skills → Add source** is optional for these two sources (use the repository URL; both
+     expose `skills/` at the repository root). The user may also run `dam skill source add <url>`
+     from their machine.
+   The fifteen skills are:
    - `lahs-agentic-workflows`: `connect-cluster`, `preflight`, `run-workflow`, `report-run`,
      `agent-run-report`;
    - `lahs-workflows`: `run-lahs-workflow`, `run-managed-workflow`, `analyse-sweep`,
-     `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`.
+     `run-research-study`, `build-surface-model`, `report-agent-issue`, `request-skill`;
+   - `Qiskit/skills`: `select-error-mitigation`, `simulate-fermionic-systems`,
+     `managed-workflows-quickstart`.
 
-   If your harness has no skill tools, read the `SKILL.md` files directly from the checkouts; that
-   is sufficient. Call `complete_onboarding_step` for `skills` when the skills are installed or
-   available from the cloned checkouts; otherwise report which are missing and leave it open.
+   If your harness has no skill tools, read the Hamiltonian Simulations `SKILL.md` files from the
+   checkouts and have the user enable the three Qiskit skills in DAM's Skills UI. Confirm all three
+   Qiskit skills are available with their bundled scripts and references. The other twelve must
+   be installed or readable from the checkouts. Complete the quickstart checks below before
+   calling `complete_onboarding_step` for `skills`; otherwise report what is missing and leave it open.
+   Download/install the entire `skills/managed-workflows-quickstart` folder during onboarding,
+   including `SKILL.md`, `scale_probe.py`, `size_calculator.py`, `mw_telemetry.py`, `mw_sweep.py`
+   and `sizing_guide.md`. DAM's skill installer copies the complete directory from the Qiskit
+   source; resolve the installed folder through the skill tools, not a knowledge-base checkout.
+   Preserve its code. After installation, add the following line immediately
+   below the heading in its installed `SKILL.md`, only if the line is not already present:
+
+   > `run-managed-workflow` is the superset of this skill and takes priority; reuse this folder's sizing and telemetry helpers under its deployment, execution and approval rules.
+
+   Re-check the note and the five supporting files before completing the skills step. Apply the
+   note on reruns even when installation was skipped; missing code or the priority note means
+   the step is incomplete. Do not vendor this folder into either Hamiltonian Simulations checkout.
 
 4. **IBM Quantum managed workflows.** Ask the user whether the `lahs-workflows` deployments are
    running on their managed workflows instance, and ask them to confirm the titles: `lahs-workflows`

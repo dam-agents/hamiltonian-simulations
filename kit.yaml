@@ -27,10 +27,12 @@ connections:
     note: Read-only mirror of the Hamiltonian Simulations knowledge bases as tgz bundles (hs-distributions-bucket/hamiltonian-simulations-kit on s3.us-south.cloud-object-storage.appdomain.cloud). Used when github.ibm.com is not reachable. The agent never writes there; grant any Object Storage connection with that endpoint/bucket (name is auto-discovered by endpoint).
 
 # The public kit repo has no skills of its own: the Hamiltonian Simulations knowledge bases are
-# provided by the GitHub Enterprise repositories. Both expose skills/ at the repository root, so
+# provided by the GitHub Enterprise repositories, alongside skills from Qiskit/skills.
+# All three expose skills/ at the repository root, so
 # each source is the repository URL (no tree or subdirectory URL). The platform
 # installs these only from sources that already exist; ONBOARDING step 3 installs
-# all twelve from them and falls back to the cloned checkouts when a source is missing.
+# all of them, registering the Qiskit source automatically if missing. Missing GHE sources
+# fall back to the cloned checkouts.
 skills:
   - source: https://github.ibm.com/LAHS/lahs-agentic-workflows
     name: connect-cluster
@@ -56,6 +58,12 @@ skills:
     name: report-agent-issue
   - source: https://github.ibm.com/LAHS/lahs-workflows
     name: request-skill
+  - source: https://github.com/Qiskit/skills
+    name: select-error-mitigation
+  - source: https://github.com/Qiskit/skills
+    name: simulate-fermionic-systems
+  - source: https://github.com/Qiskit/skills
+    name: managed-workflows-quickstart
 
 # Seed the public kit metadata; the GHE checkout is cloned by onboarding.
 seed:
@@ -65,6 +73,7 @@ seed:
 egressPreset: trusted
 egressRules:
   - host: github.ibm.com
+  - host: github.com
   # toolchain and literature inputs: uv installs, DOI/Crossref metadata, paper SI and
   # open/preprint servers, and the main chemistry/physics publishers.
   - host: pypi.org
@@ -108,7 +117,10 @@ onboarding:
     ~/work/lahs-agentic-workflows and run bin/dam-setup setup there to update both
     repositories and install the tooling; use `uv run --no-project --with …` for tooling and never
     install the execution env (`uv sync --extra core`/`--all-extras`) or run the pipeline from the
-    checkout. Then check GitHub access, install the twelve skills from both repositories, guide
+    checkout. Then check GitHub access, automatically register the https://github.com/Qiskit/skills
+    skill source if missing using skill source tools or `dam skill source add`,
+    install the fifteen listed skills from the three sources, download the complete managed-workflows-quickstart
+    folder from Qiskit and add its run-managed-workflow priority note as ONBOARDING.md specifies, guide
     the user through saving their IBM
     Quantum account (managed workflows instance CRN and API key,
     typed into a hidden prompt in DAM's Terminal (browser) or a local shell), and

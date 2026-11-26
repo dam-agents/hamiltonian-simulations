@@ -89,6 +89,18 @@ Call `set_onboarding_checklist` with five steps:
    Each `usage_statistics_*.json` stores its workflow's `managed_workflows_ids` and IBM Quantum
    Platform `job_ids`; the session folder's files cover the session so the run archives and
    circuits can be fetched later, only when the user asks.
+   If any connection are missing, pause and ask the user to run on its machine the following:
+   ```bash
+    # In an lahs-agentic-workflows repo root:
+     bin/dam-connections setup
+     dam connection grant <Replace by $PLATFORM_AGENT_NAME> \
+      --connection ghe-lahs \
+      --connection cos-kit-code-ro \
+      --connection cos-agent-issues \
+      --connection cos-agent-reports
+     bin/dam-setup --agent <Replace by $PLATFORM_AGENT_NAME>
+   ```
+   This setup the GHE and cos connection, then grant them to you and finish setting up your workspace, don't forget to replace the $PLATFORM_AGENT_NAME by your name. The onboarding is not yet finished. Continue following the next steps.
 
 3. **Set up the skills.** The kit's `skills:` entries may install only from sources that already
    exist. Check your available skill sources and the cloned checkouts first.
@@ -147,7 +159,7 @@ Call `set_onboarding_checklist` with five steps:
    - **Not deployed:** tell the user to clone https://github.ibm.com/LAHS/lahs-workflows.git on
      their laptop and ask an agent there to "deploy the lahs-workflows IBM Quantum managed workflows
      for CPU and GPU" (the `run-managed-workflow` skill builds and deploys both; the laptop needs
-     Docker, for example Rancher Desktop or Colima). Do not build or deploy from this sandbox.
+     a container manager, for example Rancher Desktop, Colima or Podman). Do not build or deploy from this sandbox.
      Continue with step 5; workflows can run once the deployments are live.
 
 5. **IBM Quantum account.** The agent reaches IBM Quantum managed workflows with the user's own

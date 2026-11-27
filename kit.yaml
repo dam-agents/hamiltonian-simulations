@@ -71,32 +71,12 @@ seed:
   into: home
 
 egressPreset: trusted
+
+# IBM hosts are fully trusted and unrestricted. The non-IBM hosts the kit adds are fetch-only:
+# writes are deliberately left out, so DAM asks the user before the agent posts.
 egressRules:
+  # --- IBM: fully trusted, unrestricted -----------------------------------
   - host: github.ibm.com
-  - host: github.com
-  # toolchain and literature inputs: uv installs, DOI/Crossref metadata, paper SI and
-  # open/preprint servers, and the main chemistry/physics publishers.
-  - host: pypi.org
-  - host: files.pythonhosted.org
-  - host: api.figshare.com
-  - host: ndownloader.figshare.com
-  - host: api.crossref.org
-  - host: doi.org
-  - host: arxiv.org
-  - host: export.arxiv.org
-  - host: chemrxiv.org
-  - host: pubs.acs.org
-  - host: pubs.rsc.org
-  - host: pubs.aip.org
-  - host: journals.aps.org
-  - host: www.nature.com
-  - host: www.science.org
-  - host: link.springer.com
-  - host: www.sciencedirect.com
-  - host: onlinelibrary.wiley.com
-  - host: pubchem.ncbi.nlm.nih.gov
-  - host: cdnjs.cloudflare.com
-  - host: cdn.jsdelivr.net
   - host: cloud.ibm.com
   - host: iam.cloud.ibm.com
   - host: resource-controller.cloud.ibm.com
@@ -105,9 +85,51 @@ egressRules:
   - host: quantum.cloud.ibm.com
   - host: eu-de.quantum.cloud.ibm.com
   - host: qiskit-serverless.quantum.ibm.com
+
+  # --- COS: fully trusted (IBM) -------------------------------------------
+  - host: s3.us-south.cloud-object-storage.appdomain.cloud
   - host: s3.us-east.cloud-object-storage.appdomain.cloud
   - host: s3.eu-de.cloud-object-storage.appdomain.cloud
-  - host: s3.us-south.cloud-object-storage.appdomain.cloud
+  # virtual-hosted presigned URLs use a bucket subdomain
+  - host: "*.s3.us-south.cloud-object-storage.appdomain.cloud"
+  - host: "*.s3.us-east.cloud-object-storage.appdomain.cloud"
+  - host: "*.s3.eu-de.cloud-object-storage.appdomain.cloud"
+
+  # --- literature and chemistry data: fetch only --------------------------
+  - host: api.figshare.com
+    method: GET
+  - host: ndownloader.figshare.com
+    method: GET
+  - host: api.crossref.org
+    method: GET
+  - host: doi.org
+    method: GET
+  - host: arxiv.org
+    method: GET
+  - host: chemrxiv.org
+    method: GET
+  - host: pubs.acs.org
+    method: GET
+  - host: pubs.rsc.org
+    method: GET
+  - host: pubs.aip.org
+    method: GET
+  - host: journals.aps.org
+    method: GET
+  - host: www.nature.com
+    method: GET
+  - host: www.science.org
+    method: GET
+  - host: link.springer.com
+    method: GET
+  - host: www.sciencedirect.com
+    method: GET
+  - host: onlinelibrary.wiley.com
+    method: GET
+  - host: pubchem.ncbi.nlm.nih.gov
+    method: GET
+  - host: cdnjs.cloudflare.com
+    method: GET
 
 # The first turn of a new agent. Every step in ONBOARDING.md is safe to re-run.
 onboarding:

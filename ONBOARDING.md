@@ -97,7 +97,8 @@ Call `set_onboarding_checklist` with five steps:
       --connection ghe-lahs \
       --connection cos-kit-code-ro \
       --connection cos-agent-issues \
-      --connection cos-agent-reports
+      --connection cos-agent-reports \
+      --connection cos-dataplane
      bin/dam-setup --agent <Replace by $PLATFORM_AGENT_NAME>
    ```
    This setup the GHE and cos connection, then grant them to you and finish setting up your workspace, don't forget to replace the $PLATFORM_AGENT_NAME by your name. The onboarding is not yet finished. Continue following the next steps.
